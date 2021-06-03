@@ -1,0 +1,47 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    service: aiot-mysql
+  name: aiot-mysql
+#  namespace: aiot
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: aiot-mysql
+    spec:
+      containers:
+      - image: aiot/bigdata/mysql:v1
+        name: aiot-mysql
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - mountPath: /usr/mysql
+          name: mysqlpvc
+        resources: {}
+      restartPolicy: Always
+      volumes:
+      - name: mysqlpvc
+        persistentVolumeClaim:
+          claimName: mysqlpvc
+status: {}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    service: aiot-mysql
+  name: mysql
+spec:
+  clusterIP: None
+  ports:
+  - name: "mysql"
+    port: 3306
+    targetPort: 3306
+  selector:
+    service: aiot-mysql
+status: {}
